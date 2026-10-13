@@ -1,0 +1,7 @@
+{
+  "name": "aiffel-rag",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "아이펠 생활 안내 챗봇 (로컬 RAG)"
+}
