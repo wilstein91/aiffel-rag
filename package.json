@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "아이펠 생활 안내 챗봇 (로컬 RAG)"
+  "description": "아이펠 생활 안내 챗봇 (로컬 RAG)",
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.1"
+  }
 }

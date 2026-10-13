@@ -32,7 +32,14 @@
 - text는 최소 120자, 사실 하나. 원문에 없는 말을 보태지 않는다.
 - url은 확인 가능한 출처. 웹은 실제 주소(https://aiffel.io/...), 내 문서는 docs/rules.md#제목(공백은 하이픈).
 
+## 임베딩 계약 (src/embedder.mjs 한 곳에서만 정의)
+- 모델 onnx-community/embeddinggemma-300m-ONNX, transformers.js
+  pipeline("feature-extraction", MODEL, { dtype: "q8" }), 호출 옵션 { pooling: "mean", normalize: true }, 768차원.
+- 입력 형식(모델 카드 공식 형식): 문서는 "title: " + section + " | text: " + text, 질문은 "task: search result | query: " + question.
+- 파이프라인은 한 번만 만들어 재사용. export: embedDocument(chunk), embedQuery(question), MODEL, DTYPE, DIM.
+- 벡터 저장소 data/vectors.json은 { model, dtype, dim, createdAt, chunks: [{ id, text, url, section, vector }] }.
+  저장소의 model·dtype이 현재 embedder와 다르면 검색을 거부하고 "build-index를 다시 실행하라"고 안내.
+
 ## 결정 필요
-- 임베딩 모델과 설정(정밀도, 입력 형식, 벡터 만드는 방법)은 무엇으로 할까?
 - 검색 결과를 몇 개 보여 주고, 점수가 몇 점 아래면 "관련 자료가 약함"으로 볼까?
 - LLM에게 어떤 규칙(시스템 메시지)을 줄까?
