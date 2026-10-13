@@ -1,6 +1,6 @@
 // Ollama와 주고받는 일만 담당 — CLAUDE.md "생성 계약"
 const OLLAMA = "http://localhost:11434";
-const MODEL = "qwen3.5:2b";
+export const DEFAULT_MODEL = "qwen3.5:2b";
 
 // ① 켜져 있나 확인 (모델 목록을 달라고 해서 답이 오면 켜져 있는 것)
 export async function pingOllama() {
@@ -13,10 +13,10 @@ export async function pingOllama() {
 }
 
 // ② 질문 보내기 → ③ 조각(토큰)이 올 때마다 onToken 호출 → ④ 끝나면 전체 답변 반환
-export async function chatStream(messages, onToken) {
+export async function chatStream(messages, onToken, model = DEFAULT_MODEL) {
   const res = await fetch(`${OLLAMA}/api/chat`, {
     method: "POST",
-    body: JSON.stringify({ model: MODEL, messages, stream: true, think: false, options: { temperature: 0 } }),
+    body: JSON.stringify({ model, messages, stream: true, think: false, options: { temperature: 0 } }),
   });
   if (!res.ok) throw new Error(`Ollama 응답 오류 ${res.status}: ${await res.text()}`);
 

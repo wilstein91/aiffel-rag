@@ -1,22 +1,24 @@
 // [2단계 완성품] 검색 + 프롬프트 조립 + LLM 답변 + 근거 목록
-// 사용법: node src/ask.mjs "질문" [--k 3] [--show-prompt] [--no-rag]
+// 사용법: node src/ask.mjs "질문" [--k 3] [--show-prompt] [--no-rag] [--model 이름]
 import { search, WEAK_THRESHOLD } from "./search.mjs";
 import { SYSTEM_MESSAGE, buildPrompt } from "./prompt.mjs";
-import { pingOllama, chatStream } from "./ollama.mjs";
+import { pingOllama, chatStream, DEFAULT_MODEL } from "./ollama.mjs";
 
 const args = process.argv.slice(2);
 let k = 3;
 let showPrompt = false;
 let noRag = false;
 let question = null;
+let model = DEFAULT_MODEL;
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--k") k = Number(args[++i]);
   else if (args[i] === "--show-prompt") showPrompt = true;
   else if (args[i] === "--no-rag") noRag = true;
+  else if (args[i] === "--model") model = args[++i];
   else question = args[i];
 }
 if (!question) {
-  console.log('사용법: node src/ask.mjs "질문" [--k 3] [--show-prompt] [--no-rag]');
+  console.log('사용법: node src/ask.mjs "질문" [--k 3] [--show-prompt] [--no-rag] [--model 이름]');
   process.exit(0);
 }
 
@@ -59,7 +61,7 @@ for (const { chunk, score } of hits) {
 
 // 2) LLM 답변 (스트리밍)
 await ensureOllama();
-console.log("💬 답변");
+console.log(`💬 답변 (${model})`);
 const t1 = performance.now();
 const answer = await chatStream(
   [
@@ -67,6 +69,7 @@ const answer = await chatStream(
     { role: "user", content: userPrompt },
   ],
   (tok) => process.stdout.write(tok),
+  model,
 );
 const answerSec = seconds(t1);
 
